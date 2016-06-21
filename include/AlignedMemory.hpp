@@ -5,16 +5,16 @@
 
 namespace mem {
 
-  struct AlignedAllocator {
-    void* operator()(::std::size_t size, ::std::size_t alignment);
-  };
+struct AlignedAllocator {
+  void* operator()(::std::size_t size, ::std::size_t alignment);
+};
 
-  struct AlignedDeleter {
-    void operator()(void* p);
-  };
+struct AlignedDeleter {
+  void operator()(void* p);
+};
 
-  extern AlignedAllocator defaultAllocator;
-  extern AlignedDeleter defaultDeleter;
+extern AlignedAllocator defaultAllocator;
+extern AlignedDeleter defaultDeleter;
 }
 
 #endif
