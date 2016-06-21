@@ -3,7 +3,7 @@ CXX := clang++
 OPTS ?= -O3 -march=native
 CXXFLAGS := -I$(RAJA_INSTALL_DIR)/include -I./include $(OPTS)
 CPPFLAGS := -std=c++11 -fopenmp -MMD -DEXTRALARGE_DATASET
-LDFLAGS := $(RAJA_INSTALL_DIR)/lib/libRAJA.a -lrt
+LDLIBS := $(RAJA_INSTALL_DIR)/lib/libRAJA.a -lrt
 
 INSTALLPREFIX := dist/PolyBench
 PREFIX := build/PolyBench
@@ -35,13 +35,13 @@ setup :
 	-@mkdir -p $(BINDIR) $(OBJDIR) $(LIBDIR)
 
 $(BIN) : $(BINDIR)/% : $(OBJDIR)/%.o $(LIB)
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) $^ -o $@
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $^ $(LDLIBS) -o $@
 
 $(OBJ) : $(OBJDIR)/%.o : $(SRCDIR)/%.cpp
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $< -c -o $@
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 $(LIBOBJ) : $(OBJDIR)/%.o : $(SRCDIR)/%.cpp
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $< -c -o $@
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 
 $(LIB) : $(LIBOBJ)

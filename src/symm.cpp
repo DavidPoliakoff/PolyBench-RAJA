@@ -70,7 +70,7 @@ static void kernel_symm(int m,
 #pragma endscop
 }
 
-int main(int argc, char &&argv) {
+int main(int argc, char** argv) {
   int m = M;
   int n = N;
   double alpha;

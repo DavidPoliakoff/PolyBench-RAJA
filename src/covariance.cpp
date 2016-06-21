@@ -19,7 +19,7 @@ static void init_array(int m, int n, double* float_n, Arr2D<double>* data) {
   );
 }
 
-static void print_array(int m, double cov->at(M,M)) {
+static void print_array(int m, const Arr2D<double>* cov) {
   int i, j;
   fprintf(stderr, "==BEGIN DUMP_ARRAYS==\n");
   fprintf(stderr, "begin dump: %s", "cov");
@@ -75,7 +75,7 @@ int main(int argc, char** argv) {
   double float_n;
 	Arr2D<double> data { n, m };
 	Arr2D<double> cov { m, m };
-	Arr2D<double> mean { m };
+	Arr1D<double> mean { m };
 
   init_array(m, n, &float_n, &data);
   {

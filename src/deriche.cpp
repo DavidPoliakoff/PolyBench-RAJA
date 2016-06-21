@@ -97,11 +97,11 @@ static void kernel_deriche(int w,
 		float _yp1 { 0.0f  }, _yp2 { 0.0f  }, _tp1 { 0.0f  }, _tp2 { 0.0f  };
 		float *yp1 { &_yp1 }, *yp2 { &_yp2 }, *tp1 { &_tp1 }, *tp2 { &_tp2 };
     RAJA::forall<RAJA::simd_exec> (w - 1, -1, -1, [=] (int i) {
-      y2->at(i,j) = a7 * tp1 + a8 * tp2 + b1 * yp1 + b2 * yp2;
-      tp2 = tp1;
-      tp1 = imgOut->at(i,j);
-      yp2 = yp1;
-      yp1 = y2->at(i,j);
+      y2->at(i,j) = a7 * *tp1 + a8 * *tp2 + b1 * *yp1 + b2 * *yp2;
+      *tp2 = *tp1;
+      *tp1 = imgOut->at(i,j);
+      *yp2 = *yp1;
+      *yp1 = y2->at(i,j);
     });
   });
   RAJA::forallN<Independent2DTiled> (

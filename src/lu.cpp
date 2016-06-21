@@ -37,7 +37,7 @@ static void init_array(int n, Arr2D<double>* A) {
     RAJA::RangeSegment { 0, n },
     RAJA::RangeSegment { 0, n },
     [=] (int r, int s) {
-      A->at(r,s) = (*B)[r][s];
+      A->at(r,s) = B->at(r,s);
     }
   );
 }
@@ -59,13 +59,13 @@ static void kernel_lu(int n, Arr2D<double>* A) {
 #pragma scop
   RAJA::forall<RAJA::seq_exec> (0, n, [=] (int i) {
     RAJA::forall<RAJA::omp_parallel_for_exec> (0, i, [=] (int j) {
-      RAJA::forall<RAJA::simd_exec> (0, j, [=] (int j) {
+      RAJA::forall<RAJA::simd_exec> (0, j, [=] (int k) {
         A->at(i,j) -= A->at(i,k) * A->at(k,j);
       });
       A->at(i,j) /= A->at(j,j);
     });
     RAJA::forall<RAJA::omp_parallel_for_exec> (i, n, [=] (int j) {
-      RAJA::forall<RAJA::simd_exec> (0, i, [=] (int j) {
+      RAJA::forall<RAJA::simd_exec> (0, i, [=] (int k) {
         A->at(i,j) -= A->at(i,k) * A->at(k,j);
       });
       A->at(i,j) /= A->at(j,j);

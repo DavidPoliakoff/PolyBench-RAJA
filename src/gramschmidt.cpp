@@ -60,7 +60,7 @@ static void kernel_gramschmidt(int m,
                                Arr2D<double>* Q) {
 #pragma scop
   RAJA::forall<RAJA::seq_exec> (0, n, [=] (int k) {
-		RAJA::ReduceSum<RAJA::omp_reducer,double> nrm { 0.0 };
+		RAJA::ReduceSum<RAJA::omp_reduce,double> nrm { 0.0 };
     RAJA::forall<RAJA::omp_parallel_for_exec> (0, m, [=] (int i) {
       nrm += A->at(i,k) * A->at(i,k);
     });

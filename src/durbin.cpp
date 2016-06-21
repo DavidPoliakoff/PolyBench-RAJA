@@ -8,19 +8,19 @@
 /* Include benchmark-specific header. */
 #include "durbin.hpp"
 
-static void init_array(int n, Arr2D<double>* r) {
+static void init_array(int n, Arr1D<double>* r) {
   RAJA::forall<RAJA::omp_parallel_for_exec> (0, n, [=] (int i) {
 		r->at(i) = (n + 1 - i);
   });
 }
 
-static void print_array(int n, double y[N]) {
+static void print_array(int n, const Arr1D<double>* y) {
   int i;
   fprintf(stderr, "==BEGIN DUMP_ARRAYS==\n");
   fprintf(stderr, "begin dump: %s", "y");
   for (i = 0; i < n; i++) {
     if (i % 20 == 0) fprintf(stderr, "\n");
-    fprintf(stderr, "%0.2lf ", y[i]);
+    fprintf(stderr, "%0.2lf ", y->at(i));
   }
   fprintf(stderr, "\nend   dump: %s\n", "y");
   fprintf(stderr, "==END   DUMP_ARRAYS==\n");
@@ -39,7 +39,7 @@ static void kernel_durbin(int n, const Arr1D<double>* r, Arr1D<double>* y) {
     RAJA::forall<RAJA::omp_parallel_for_exec> (0, k, [=] (int i) {
       sum += r->at(k - i - 1) * y->at(i);
     });
-    alpha = -(r->at(k) + sum) / beta;
+    *alpha = -(r->at(k) + sum) / *beta;
     RAJA::forall<RAJA::omp_parallel_for_exec> (0, k, [=] (int i) {
       z->at(i) = y->at(i) + *alpha * y->at(k - i - 1);
     });
@@ -56,7 +56,7 @@ int main(int argc, char** argv) {
 	Arr1D<double> r { n }, y { n };
   init_array(n, &r);
   {
-		util::block_timer t { "DURBIN" }
+		util::block_timer t { "DURBIN" };
 		kernel_durbin(n, &r, &y);
 	}
 	if (argc > 42)
