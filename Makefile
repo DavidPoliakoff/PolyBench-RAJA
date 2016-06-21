@@ -1,8 +1,9 @@
 RAJA_INSTALL_DIR := dist/RAJA
 CXX := clang++
-CXXFLAGS := -I$(RAJA_INSTALL_DIR)/include -I./include -O3 -march=native
-CPPFLAGS := -std=c++11 -fopenmp
-LDFLAGS := $(RAJA_INSTALL_DIR)/lib/libRAJA.a
+OPTS ?= -O3 -march=native
+CXXFLAGS := -I$(RAJA_INSTALL_DIR)/include -I./include $(OPTS)
+CPPFLAGS := -std=c++11 -fopenmp -MMD -DEXTRALARGE_DATASET
+LDFLAGS := $(RAJA_INSTALL_DIR)/lib/libRAJA.a -lrt
 
 INSTALLPREFIX := dist/PolyBench
 PREFIX := build/PolyBench
@@ -12,8 +13,12 @@ OBJDIR := $(PREFIX)/obj
 LIBDIR := $(INSTALLPREFIX)/lib
 BINDIR := $(INSTALLPREFIX)/bin
 
-LIBSRC := $(SRCDIR)/polybench_raja.cpp
+LIBSRCS := AlignedMemory.cpp
+LIBSRC := $(patsubst %,$(SRCDIR)/%,$(LIBSRCS))
+
 SRC := $(wildcard $(SRCDIR)/*.cpp)
+DEPS := $(patsubst $(SRCDIR)%.cpp,$(OBJDIR)/%.d,$(SRC))
+
 SRC := $(filter-out $(LIBSRC),$(SRC))
 
 OBJ := $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(SRC))
@@ -38,8 +43,26 @@ $(OBJ) : $(OBJDIR)/%.o : $(SRCDIR)/%.cpp
 $(LIBOBJ) : $(OBJDIR)/%.o : $(SRCDIR)/%.cpp
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $< -c -o $@
 
+
 $(LIB) : $(LIBOBJ)
-	$(AR) $(ARFLAGS) $@ $<
+	$(AR) $(ARFLAGS) $@ $^
+
+lib : $(LIBDIR) $(LIB)
 
 clean :
 	@-rm -vfr $(OBJDIR) $(BINDIR) $(LIBDIR)
+
+DIRS := $(OBJDIR) $(BINDIR) $(LIBDIR)
+
+dirs : $(DIRS)
+
+$(OBJDIR) :
+	-mkdir -p $@
+
+$(BINDIR) :
+	-mkdir -p $@
+
+$(LIBDIR) :
+	-mkdir -p $@
+
+-include $(DEPS)

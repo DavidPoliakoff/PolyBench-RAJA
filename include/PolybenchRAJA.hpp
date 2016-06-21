@@ -18,10 +18,18 @@
 #ifndef POLYBENCH_RAJA_HPP
 #define POLYBENCH_RAJA_HPP
 
-#include <cstdlib>
+#ifndef POLYBENCH_CACHE_SIZE_KB
+#define POLYBENCH_CACHE_SIZE_KB 32770
+#endif
 
-#define RAJA_ENABLE_NESTED 1
+#ifndef POLYBENCH_CACHE_LINE_SIZE_B
+#define POLYBENCH_CACHE_LINE_SIZE_B 64
+#endif
+
 #include <RAJA/RAJA.hxx>
+
+#include <MultiDimArray.hpp>
+#include <timer.hpp>
 
 using OMP_ParallelRegion = typename RAJA::NestedPolicy<
   RAJA::ExecList<
@@ -101,15 +109,5 @@ using Independent3DTiledVerbose = typename RAJA::NestedPolicy<
 
 using Independent3DTiled = Independent3DTiledVerbose<>;
 
-extern double polybench_program_total_flops;
-extern void polybench_timer_start();
-extern void polybench_timer_stop();
-extern void polybench_timer_print();
-
-extern void* polybench_alloc_data(unsigned long long int n, int elt_size);
-extern void polybench_free_data(void* ptr);
-
-extern void polybench_flush_cache();
-extern void polybench_prepare_instruments();
 
 #endif /* !POLYBENCH_RAJA_HPP */
